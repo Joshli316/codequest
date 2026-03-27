@@ -334,12 +334,14 @@
 
 /* Certificate */
 .certificate-preview {
-  background: var(--white);
-  color: var(--black);
-  padding: var(--space-xl);
+  background: linear-gradient(135deg, #0a1628, #1a2a4a);
+  color: #ffffff;
+  padding: var(--space-xl) var(--space-lg);
   border-radius: var(--radius-md);
   text-align: center;
   margin: var(--space-md) 0;
+  border: 2px solid var(--gold);
+  width: 100%;
 }
 
 /* Workflow slots */

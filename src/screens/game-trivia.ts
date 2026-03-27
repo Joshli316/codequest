@@ -4,7 +4,7 @@ import { renderHeader } from '../components/header';
 import { playSound } from '../components/audio';
 import { vocabulary } from '../data/vocabulary';
 import { renderResults } from './results';
-import { shuffle } from '../utils';
+import { shuffle, setupQuizOptions, renderFeedback } from '../utils';
 
 interface TriviaQuestion {
   question_zh: string;
@@ -117,68 +117,45 @@ export function renderTrivia(container: HTMLElement, worldId: number, levelIndex
 
       if (timeLeft <= 0) {
         clearTimer();
-        handleAnswer(-1); // time's up
+        handleTimeout();
       }
     }, 100);
 
     router.setCleanup(() => clearTimer());
 
-    // Option clicks
-    const optionBtns = container.querySelectorAll('.option-btn');
-    optionBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const idx = parseInt((btn as HTMLElement).dataset.index || '-1');
-        handleAnswer(idx);
-      });
-    });
-
-    let answered = false;
-
-    function handleAnswer(selectedIndex: number) {
-      if (answered) return;
-      answered = true;
+    function handleAnswer(correct: boolean) {
       clearTimer();
-
-      const isCorrect = selectedIndex === q.correctIndex;
       const feedback = container.querySelector('#feedback') as HTMLElement;
-      const optBtns = container.querySelectorAll('.option-btn');
-
-      // Disable all options
-      optBtns.forEach(btn => btn.classList.add('disabled'));
-
-      // Highlight correct/wrong
-      optBtns.forEach((btn, i) => {
-        if (i === q.correctIndex) btn.classList.add('correct');
-        if (i === selectedIndex && !isCorrect) btn.classList.add('wrong');
-      });
-
-      if (isCorrect) {
+      feedback.style.display = 'block';
+      if (correct) {
         correctCount++;
-        playSound('correct');
-        feedback.style.display = 'block';
-        feedback.style.background = 'rgba(0, 212, 170, 0.1)';
-        feedback.style.border = '1px solid var(--green)';
-        feedback.innerHTML = `<strong>正确！ Correct!</strong><br>${q.explanation}`;
+        feedback.innerHTML = renderFeedback(true, `<strong>正确！ Correct!</strong><br>${q.explanation}`);
       } else {
-        playSound('wrong');
-        // Add to review queue based on vocabulary match
         const term = vocabulary.find(v => v.en === q.options[q.correctIndex]);
-        if (term) {
-          state.addToReviewQueue({ id: term.id, type: 'vocab' });
-        }
-        feedback.style.display = 'block';
-        feedback.style.background = 'rgba(255, 107, 107, 0.1)';
-        feedback.style.border = '1px solid var(--red)';
-        const timeUp = selectedIndex === -1 ? '时间到！ Time\'s up! ' : '';
-        feedback.innerHTML = `<strong>${timeUp}正确答案: ${q.options[q.correctIndex]}</strong><br>${q.explanation}`;
+        if (term) state.addToReviewQueue({ id: term.id, type: 'vocab' });
+        feedback.innerHTML = renderFeedback(false, `<strong>正确答案: ${q.options[q.correctIndex]}</strong><br>${q.explanation}`);
       }
-
-      // Auto-advance after delay
-      setTimeout(() => {
-        currentIndex++;
-        renderQuestion();
-      }, 2500);
+      setTimeout(() => { currentIndex++; renderQuestion(); }, 2500);
     }
+
+    function handleTimeout() {
+      clearTimer();
+      const btns = container.querySelectorAll('.option-btn');
+      btns.forEach(b => b.classList.add('disabled'));
+      btns.forEach((b, i) => { if (i === q.correctIndex) b.classList.add('correct'); });
+      playSound('wrong');
+      const feedback = container.querySelector('#feedback') as HTMLElement;
+      feedback.style.display = 'block';
+      feedback.innerHTML = renderFeedback(false, `<strong>时间到！ Time's up! 正确答案: ${q.options[q.correctIndex]}</strong><br>${q.explanation}`);
+      const term = vocabulary.find(v => v.en === q.options[q.correctIndex]);
+      if (term) state.addToReviewQueue({ id: term.id, type: 'vocab' });
+      setTimeout(() => { currentIndex++; renderQuestion(); }, 2500);
+    }
+
+    setupQuizOptions(container, q.correctIndex,
+      () => handleAnswer(true),
+      () => handleAnswer(false),
+    );
   }
 
   renderQuestion();

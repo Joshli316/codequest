@@ -1,10 +1,9 @@
 import { state } from '../state';
 import { renderHeader } from '../components/header';
-import { playSound } from '../components/audio';
 import { commands } from '../data/commands';
 import { renderTerminal, initTerminal } from '../components/terminal';
 import { renderResults } from './results';
-import { shuffle } from '../utils';
+import { shuffle, setupQuizOptions, renderFeedback } from '../utils';
 
 export function renderCharades(container: HTMLElement, worldId: number, levelIndex: number) {
   const TOTAL = 8;
@@ -34,6 +33,7 @@ export function renderCharades(container: HTMLElement, worldId: number, levelInd
       ...cmd.wrongChoices,
     ]);
     const correctOption = cmd.command + ' — ' + cmd.zhName;
+    const correctIdx = options.indexOf(correctOption);
     const labels = ['A', 'B', 'C', 'D'];
 
     container.innerHTML = `
@@ -63,64 +63,42 @@ export function renderCharades(container: HTMLElement, worldId: number, levelInd
       </div>
     `;
 
-    let answered = false;
-    const optionBtns = container.querySelectorAll('.option-btn');
+    const feedbackArea = container.querySelector('#feedback-area') as HTMLElement;
 
-    optionBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        if (answered) return;
-        answered = true;
-
-        const text = (btn as HTMLElement).dataset.text || '';
-        const isCorrect = text === correctOption;
-        const feedbackArea = container.querySelector('#feedback-area') as HTMLElement;
-
-        // Disable all and highlight
-        optionBtns.forEach(b => {
-          b.classList.add('disabled');
-          const bText = (b as HTMLElement).dataset.text || '';
-          if (bText === correctOption) b.classList.add('correct');
-          if (bText === text && !isCorrect) b.classList.add('wrong');
+    function showResult(correct: boolean) {
+      feedbackArea.style.display = 'block';
+      if (correct) {
+        correctCount++;
+        feedbackArea.innerHTML = `
+          ${renderFeedback(true, `<strong>正确！ Correct!</strong><br>${cmd.zhDescription}`)}
+          <button class="btn btn-secondary btn-block" id="try-terminal" style="margin-top:var(--space-sm);">试试看 Try It</button>
+          <div id="terminal-sandbox" style="display:none;margin-top:var(--space-md);"></div>
+          <button class="btn btn-primary btn-block" id="next-btn" style="margin-top:var(--space-sm);">下一题 Next →</button>
+        `;
+        container.querySelector('#try-terminal')?.addEventListener('click', () => {
+          const sandbox = container.querySelector('#terminal-sandbox') as HTMLElement;
+          sandbox.style.display = 'block';
+          sandbox.innerHTML = renderTerminal(cmd.command);
+          initTerminal(sandbox);
+          (container.querySelector('#try-terminal') as HTMLElement).style.display = 'none';
         });
-
-        feedbackArea.style.display = 'block';
-
-        if (isCorrect) {
-          correctCount++;
-          playSound('correct');
-          feedbackArea.innerHTML = `
-            <div style="padding:var(--space-md);border-radius:var(--radius-md);background:rgba(0,212,170,0.1);border:1px solid var(--green);margin-bottom:var(--space-md);line-height:1.6;font-size:var(--text-sm);">
-              <strong>正确！ Correct!</strong><br>${cmd.zhDescription}
-            </div>
-            <button class="btn btn-secondary btn-block" id="try-terminal">试试看 Try It</button>
-            <div id="terminal-sandbox" style="display:none;margin-top:var(--space-md);"></div>
-            <button class="btn btn-primary btn-block" id="next-btn" style="margin-top:var(--space-sm);">下一题 Next →</button>
-          `;
-
-          container.querySelector('#try-terminal')?.addEventListener('click', () => {
-            const sandbox = container.querySelector('#terminal-sandbox') as HTMLElement;
-            sandbox.style.display = 'block';
-            sandbox.innerHTML = renderTerminal(cmd.command);
-            initTerminal(sandbox);
-            (container.querySelector('#try-terminal') as HTMLElement).style.display = 'none';
-          });
-        } else {
-          playSound('wrong');
-          state.addToReviewQueue({ id: cmd.id, type: 'command' });
-          feedbackArea.innerHTML = `
-            <div style="padding:var(--space-md);border-radius:var(--radius-md);background:rgba(255,107,107,0.1);border:1px solid var(--red);margin-bottom:var(--space-md);line-height:1.6;font-size:var(--text-sm);">
-              <strong>正确答案: ${cmd.command}</strong><br>${cmd.zhDescription}
-            </div>
-            <button class="btn btn-primary btn-block" id="next-btn">下一题 Next →</button>
-          `;
-        }
-
-        container.querySelector('#next-btn')?.addEventListener('click', () => {
-          currentIndex++;
-          renderScenario();
-        });
+      } else {
+        state.addToReviewQueue({ id: cmd.id, type: 'command' });
+        feedbackArea.innerHTML = `
+          ${renderFeedback(false, `<strong>正确答案: ${cmd.command}</strong><br>${cmd.zhDescription}`)}
+          <button class="btn btn-primary btn-block" id="next-btn" style="margin-top:var(--space-sm);">下一题 Next →</button>
+        `;
+      }
+      container.querySelector('#next-btn')?.addEventListener('click', () => {
+        currentIndex++;
+        renderScenario();
       });
-    });
+    }
+
+    setupQuizOptions(container, correctIdx,
+      () => showResult(true),
+      () => showResult(false),
+    );
   }
 
   renderScenario();

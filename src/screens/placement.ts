@@ -4,11 +4,11 @@ import { renderMascot } from '../components/mascot';
 import { playSound } from '../components/audio';
 import { placementQuestions } from '../data/quizzes';
 import { router } from '../router';
+import { setupQuizOptions } from '../utils';
 
 export function renderPlacement(container: HTMLElement) {
   let currentQ = 0;
   let score = 0;
-  let answered = false;
 
   function showIntro() {
     container.innerHTML = `
@@ -29,7 +29,6 @@ export function renderPlacement(container: HTMLElement) {
       return;
     }
     const q = placementQuestions[currentQ];
-    answered = false;
     container.innerHTML = `
       ${renderHeader(`${currentQ + 1} / ${placementQuestions.length}`, false)}
       <div class="game-screen">
@@ -53,31 +52,20 @@ export function renderPlacement(container: HTMLElement) {
       </div>
     `;
 
-    container.querySelectorAll('.option-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        if (answered) return;
-        answered = true;
-        const idx = parseInt(btn.getAttribute('data-index') || '0');
-        const isCorrect = idx === q.correctIndex;
-        if (isCorrect) {
-          score++;
-          btn.classList.add('correct');
-          playSound('correct');
-        } else {
-          btn.classList.add('wrong');
-          container.querySelectorAll('.option-btn')[q.correctIndex]?.classList.add('correct');
-          playSound('wrong');
-        }
-        container.querySelectorAll('.option-btn').forEach(b => b.classList.add('disabled'));
-        const exp = container.querySelector('#explanation') as HTMLElement;
-        if (exp) {
-          exp.style.display = 'block';
-          exp.innerHTML = `<p>${q.explanation_zh}</p><p style="color:var(--text-secondary);font-size:var(--text-sm);">${q.explanation_en}</p>`;
-        }
-        const nextBtn = container.querySelector('#next-btn') as HTMLElement;
-        if (nextBtn) nextBtn.style.display = 'block';
-      });
-    });
+    const showExplanation = () => {
+      const exp = container.querySelector('#explanation') as HTMLElement;
+      if (exp) {
+        exp.style.display = 'block';
+        exp.innerHTML = `<p>${q.explanation_zh}</p><p style="color:var(--text-secondary);font-size:var(--text-sm);">${q.explanation_en}</p>`;
+      }
+      const nextBtn = container.querySelector('#next-btn') as HTMLElement;
+      if (nextBtn) nextBtn.style.display = 'block';
+    };
+
+    setupQuizOptions(container, q.correctIndex,
+      () => { score++; showExplanation(); },
+      () => { showExplanation(); },
+    );
 
     container.querySelector('#next-btn')?.addEventListener('click', () => {
       currentQ++;

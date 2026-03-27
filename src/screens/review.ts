@@ -5,6 +5,7 @@ import { playSound } from '../components/audio';
 import { vocabulary } from '../data/vocabulary';
 import { commands } from '../data/commands';
 import { router } from '../router';
+import { setupQuizOptions } from '../utils';
 
 export function renderReview(container: HTMLElement) {
   const dueItems = state.getDueReviewItems(10);
@@ -81,28 +82,15 @@ export function renderReview(container: HTMLElement) {
       </div>
     `;
 
-    let answered = false;
-    container.querySelectorAll('.option-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        if (answered) return;
-        answered = true;
-        const idx = parseInt(btn.getAttribute('data-index') || '0');
-        const isCorrect = idx === correctIndex;
-        if (isCorrect) {
-          correctCount++;
-          btn.classList.add('correct');
-          state.markReviewCorrect(item.id);
-          playSound('correct');
-        } else {
-          btn.classList.add('wrong');
-          container.querySelectorAll('.option-btn')[correctIndex]?.classList.add('correct');
-          playSound('wrong');
-        }
-        container.querySelectorAll('.option-btn').forEach(b => b.classList.add('disabled'));
-        const nextBtn = container.querySelector('#next-btn') as HTMLElement;
-        if (nextBtn) nextBtn.style.display = 'block';
-      });
-    });
+    const showNext = () => {
+      const nextBtn = container.querySelector('#next-btn') as HTMLElement;
+      if (nextBtn) nextBtn.style.display = 'block';
+    };
+
+    setupQuizOptions(container, correctIndex,
+      () => { correctCount++; state.markReviewCorrect(item.id); showNext(); },
+      () => { showNext(); },
+    );
 
     container.querySelector('#next-btn')?.addEventListener('click', () => {
       currentIdx++;

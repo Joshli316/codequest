@@ -4,7 +4,7 @@ import { renderMascot } from '../components/mascot';
 import { playSound } from '../components/audio';
 import { quizzes } from '../data/quizzes';
 import { renderResults } from './results';
-import { shuffle } from '../utils';
+import { shuffle, setupQuizOptions, renderFeedback } from '../utils';
 
 function getAllQuestions() {
   const all: typeof quizzes[1] = [];
@@ -96,49 +96,19 @@ export function renderPeerChallenge(container: HTMLElement, worldId: number, lev
       </div>
     `;
 
-    let answered = false;
-    const optBtns = container.querySelectorAll('.option-btn');
+    const showFeedbackAndAdvance = (correct: boolean) => {
+      const feedback = container.querySelector('#feedback') as HTMLElement;
+      feedback.style.display = 'block';
+      feedback.innerHTML = correct
+        ? renderFeedback(true, `<strong>正确！ Correct!</strong><br>${q.explanation_zh}`)
+        : renderFeedback(false, `<strong>正确答案: ${q.options[q.correctIndex]}</strong><br>${q.explanation_zh}`);
+      setTimeout(() => { currentIndex++; renderQuiz(); }, 2000);
+    };
 
-    optBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        if (answered) return;
-        answered = true;
-
-        const idx = parseInt((btn as HTMLElement).dataset.index || '-1');
-        const isCorrect = idx === q.correctIndex;
-
-        optBtns.forEach(b => b.classList.add('disabled'));
-
-        if (isCorrect) {
-          correctCount++;
-          btn.classList.add('correct');
-          playSound('correct');
-        } else {
-          btn.classList.add('wrong');
-          optBtns.forEach((b, i) => {
-            if (i === q.correctIndex) b.classList.add('correct');
-          });
-          playSound('wrong');
-        }
-
-        const feedback = container.querySelector('#feedback') as HTMLElement;
-        feedback.style.display = 'block';
-        if (isCorrect) {
-          feedback.style.background = 'rgba(0, 212, 170, 0.1)';
-          feedback.style.border = '1px solid var(--green)';
-          feedback.innerHTML = `<strong>正确！ Correct!</strong><br>${q.explanation_zh}`;
-        } else {
-          feedback.style.background = 'rgba(255, 107, 107, 0.1)';
-          feedback.style.border = '1px solid var(--red)';
-          feedback.innerHTML = `<strong>正确答案: ${q.options[q.correctIndex]}</strong><br>${q.explanation_zh}`;
-        }
-
-        setTimeout(() => {
-          currentIndex++;
-          renderQuiz();
-        }, 2000);
-      });
-    });
+    setupQuizOptions(container, q.correctIndex,
+      () => { correctCount++; showFeedbackAndAdvance(true); },
+      () => { showFeedbackAndAdvance(false); },
+    );
   }
 
   function renderShareScreen() {

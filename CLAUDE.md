@@ -17,7 +17,9 @@ codequest/
 │   ├── main.ts             # App bootstrap, router
 │   ├── router.ts           # Hash-based SPA router
 │   ├── state.ts            # Progress, streaks, scores, review queue in localStorage
+│   ├── utils.ts            # Shared helpers: shuffle, renderFeedback, renderScoreBar, setupQuizOptions
 │   ├── data/
+│   │   ├── worlds.ts       # Single source of truth: world names, levels, level counts
 │   │   ├── vocabulary.ts   # All vocab terms with EN/ZH/pinyin/explanation
 │   │   ├── commands.ts     # Slash commands data
 │   │   ├── quizzes.ts      # Quiz question banks per world
@@ -69,8 +71,7 @@ codequest/
 `index.html` — loads compiled JS bundle
 
 ## Build
-`npx tsc && cp index.html dist/ && cp -r assets dist/`
-(Or use esbuild for bundling if needed)
+`npm run build` (esbuild bundle + copy static assets to dist/)
 
 ## Deployment
 `wrangler pages deploy dist/`

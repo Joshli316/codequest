@@ -33,6 +33,8 @@ export interface GameState {
   totalScore: number;
   dailyMissionIndex: number;
   dailyMissionDate: string;
+  failedLevels: string[];
+  studentName: string;
 }
 
 const DEFAULT_STATE: GameState = {
@@ -45,6 +47,8 @@ const DEFAULT_STATE: GameState = {
   totalScore: 0,
   dailyMissionIndex: 0,
   dailyMissionDate: '',
+  failedLevels: [],
+  studentName: '',
 };
 
 const STORAGE_KEY = 'cq_state';
@@ -139,6 +143,18 @@ class StateManager {
     this.save();
   }
 
+  markLevelFailed(worldId: number, levelIndex: number) {
+    const key = `${worldId}-${levelIndex}`;
+    if (!this.state.failedLevels.includes(key)) {
+      this.state.failedLevels.push(key);
+      this.save();
+    }
+  }
+
+  hasFailedLevel(worldId: number, levelIndex: number): boolean {
+    return this.state.failedLevels.includes(`${worldId}-${levelIndex}`);
+  }
+
   updateStreak() {
     const today = new Date().toISOString().split('T')[0];
     const last = this.state.streak.lastLogin;
@@ -214,6 +230,24 @@ class StateManager {
 
   getTotalLevelsCompleted(): number {
     return Object.values(this.state.worlds).reduce((sum, w) => sum + w.levelsCompleted.length, 0);
+  }
+
+  getLearnedVocabCount(): number {
+    let count = 0;
+    const w1 = this.state.worlds[1];
+    if (w1.levelsCompleted.includes(0)) count += 10;
+    if (w1.levelsCompleted.includes(1)) count += 10;
+    count += this.state.reviewQueue.filter(r => r.type === 'vocab' && r.correctCount > 0).length;
+    return count;
+  }
+
+  setStudentName(name: string) {
+    this.state.studentName = name.trim().slice(0, 50);
+    this.save();
+  }
+
+  getStudentName(): string {
+    return this.state.studentName;
   }
 
   getDailyMissionIndex(): number {

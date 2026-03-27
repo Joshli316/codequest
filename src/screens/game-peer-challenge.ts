@@ -99,6 +99,7 @@ export function renderPeerChallenge(container: HTMLElement, worldId: number, lev
     `;
 
     const showFeedbackAndAdvance = (correct: boolean) => {
+      playSound(correct ? 'correct' : 'wrong');
       const feedback = container.querySelector('#feedback') as HTMLElement;
       feedback.style.display = 'block';
       feedback.innerHTML = correct

@@ -1,5 +1,10 @@
 import { playSound } from './components/audio';
 
+const HTML_ESCAPES: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+export function escapeHtml(str: string): string {
+  return str.replace(/[&<>"']/g, c => HTML_ESCAPES[c] || c);
+}
+
 export function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {

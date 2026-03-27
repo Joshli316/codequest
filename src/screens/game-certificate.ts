@@ -6,7 +6,7 @@ import { showHongbao } from '../components/hongbao';
 import { quizzes } from '../data/quizzes';
 import { badges } from '../data/badges';
 import { WORLDS } from '../data/worlds';
-import { shuffle, setupQuizOptions, renderFeedback } from '../utils';
+import { shuffle, setupQuizOptions, renderFeedback, escapeHtml } from '../utils';
 import { router } from '../router';
 
 const TOTAL_QUESTIONS = 20;
@@ -172,17 +172,17 @@ function showCertificateScreen(container: HTMLElement, score: number, total: num
 
         <!-- Name input -->
         <div class="card" style="width:100%;margin-top:var(--space-md);">
-          <label style="font-size:var(--text-sm);color:var(--text-secondary);display:block;margin-bottom:var(--space-xs);">
+          <label for="student-name" style="font-size:var(--text-sm);color:var(--text-secondary);display:block;margin-bottom:var(--space-xs);">
             输入你的名字 Enter your name (for the certificate)
           </label>
           <input type="text" class="search-input" id="student-name" placeholder="你的名字 / Your Name"
-            value="${savedName}" maxlength="50" style="width:100%;" />
+            value="${escapeHtml(savedName)}" maxlength="50" style="width:100%;" />
         </div>
 
         <!-- Certificate preview -->
         <div class="certificate-preview" id="cert-preview">
           <div style="font-size:12px;color:#666;margin-bottom:8px;">🎓 CodePlay 码玩</div>
-          <div style="font-size:20px;font-weight:700;color:#0a1628;" id="cert-name-display">${savedName || '你的名字'}</div>
+          <div style="font-size:20px;font-weight:700;color:#0a1628;" id="cert-name-display">${escapeHtml(savedName) || '你的名字'}</div>
           <div style="font-size:12px;color:#444;margin-top:4px;">
             已完成 CodePlay 码玩 全部课程
           </div>

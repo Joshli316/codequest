@@ -66,6 +66,11 @@
   transform: scale(0.98);
 }
 
+.card:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
+}
+
 .card-highlight {
   border: 2px solid var(--teal);
   box-shadow: var(--shadow-glow-teal);
@@ -162,7 +167,7 @@
 
 .badge-icon.locked {
   filter: grayscale(1);
-  opacity: 0.4;
+  opacity: 0.5;
 }
 
 .badge-name {

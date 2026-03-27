@@ -21,8 +21,8 @@ export function renderHome(container: HTMLElement) {
           <p style="font-size:var(--text-sm);color:var(--text-secondary);">用游戏学会Claude Code</p>
         </div>
         <div style="display:flex;gap:var(--space-md);align-items:center;">
-          <button class="btn btn-secondary" id="btn-glossary" style="font-size:var(--text-sm);padding:var(--space-xs) var(--space-md);">📖 词典</button>
-          <button class="btn btn-secondary" id="btn-profile" style="font-size:var(--text-sm);padding:var(--space-xs) var(--space-md);">👤</button>
+          <button class="btn btn-secondary" id="btn-glossary" aria-label="词典 Glossary" style="font-size:var(--text-sm);padding:var(--space-xs) var(--space-md);">📖 词典</button>
+          <button class="btn btn-secondary" id="btn-profile" aria-label="个人资料 Profile" style="font-size:var(--text-sm);padding:var(--space-xs) var(--space-md);">👤</button>
         </div>
       </div>
 

@@ -32,7 +32,8 @@ body {
 
 a {
   color: var(--teal);
-  text-decoration: none;
+  text-decoration: underline;
+  text-decoration-style: dotted;
 }
 
 button {

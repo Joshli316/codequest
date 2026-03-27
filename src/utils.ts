@@ -1,3 +1,5 @@
+import { playSound } from './components/audio';
+
 export function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -26,13 +28,6 @@ export function renderScoreBar(current: number, total: number, correctCount: num
   `;
 }
 
-import { playSound } from './components/audio';
-
-/**
- * Attach click handlers to all .option-btn elements in a container.
- * Handles: one-answer guard, disable all, highlight correct/wrong, play sound.
- * Callers control feedback content and advancement via callbacks.
- */
 export function setupQuizOptions(
   container: HTMLElement,
   correctIndex: number,
@@ -50,8 +45,8 @@ export function setupQuizOptions(
       const idx = parseInt((btn as HTMLElement).dataset.index || String(btnIndex));
       const isCorrect = idx === correctIndex;
 
-      btns.forEach(b => b.classList.add('disabled'));
       btns.forEach((b, i) => {
+        b.classList.add('disabled');
         if (i === correctIndex) b.classList.add('correct');
         if (b === btn && !isCorrect) b.classList.add('wrong');
       });

@@ -144,7 +144,7 @@ Daily limit: 78% remaining`},{id:"review",command:"/review",zhName:"\u4EE3\u7801
     <div class="progress-bar">
       <div class="progress-bar-fill" style="width:${l}%"></div>
     </div>
-  `}function P(e,t,n,l){let i=!1,o=e.querySelectorAll(".option-btn");o.forEach((s,r)=>{s.addEventListener("click",()=>{if(i)return;i=!0;let a=parseInt(s.dataset.index||String(r)),p=a===t;o.forEach(c=>c.classList.add("disabled")),o.forEach((c,d)=>{d===t&&c.classList.add("correct"),c===s&&!p&&c.classList.add("wrong")}),C(p?"correct":"wrong"),(p?n:l)(a)})})}function de(e){let t=0,n=0;function l(){e.innerHTML=`
+  `}function P(e,t,n,l){let i=!1,o=e.querySelectorAll(".option-btn");o.forEach((s,r)=>{s.addEventListener("click",()=>{if(i)return;i=!0;let a=parseInt(s.dataset.index||String(r)),p=a===t;o.forEach((c,d)=>{c.classList.add("disabled"),d===t&&c.classList.add("correct"),c===s&&!p&&c.classList.add("wrong")}),C(p?"correct":"wrong"),(p?n:l)(a)})})}function de(e){let t=0,n=0;function l(){e.innerHTML=`
       ${w("\u80FD\u529B\u6D4B\u8BD5",!1)}
       <div class="screen" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--space-lg);">
         ${S("firstLogin")}

@@ -1,5 +1,14 @@
 import { getWorldLevelCount as getWorldLevelCountFromData } from './data/worlds';
 
+function createEmptyWorlds(): Record<number, WorldProgress> {
+  return {
+    1: { levelsCompleted: [], scores: {}, stars: {} },
+    2: { levelsCompleted: [], scores: {}, stars: {} },
+    3: { levelsCompleted: [], scores: {}, stars: {} },
+    4: { levelsCompleted: [], scores: {}, stars: {} },
+  };
+}
+
 export interface WorldProgress {
   levelsCompleted: number[];
   scores: Record<number, number>;
@@ -29,12 +38,7 @@ export interface GameState {
 const DEFAULT_STATE: GameState = {
   placementCompleted: false,
   placementScore: 0,
-  worlds: {
-    1: { levelsCompleted: [], scores: {}, stars: {} },
-    2: { levelsCompleted: [], scores: {}, stars: {} },
-    3: { levelsCompleted: [], scores: {}, stars: {} },
-    4: { levelsCompleted: [], scores: {}, stars: {} },
-  },
+  worlds: createEmptyWorlds(),
   streak: { current: 0, longest: 0, lastLogin: '' },
   badges: [],
   reviewQueue: [],
@@ -60,12 +64,9 @@ class StateManager {
         return {
           ...DEFAULT_STATE,
           ...saved,
-          worlds: {
-            1: { levelsCompleted: [], scores: {}, stars: {}, ...(saved.worlds?.[1] || {}) },
-            2: { levelsCompleted: [], scores: {}, stars: {}, ...(saved.worlds?.[2] || {}) },
-            3: { levelsCompleted: [], scores: {}, stars: {}, ...(saved.worlds?.[3] || {}) },
-            4: { levelsCompleted: [], scores: {}, stars: {}, ...(saved.worlds?.[4] || {}) },
-          },
+          worlds: Object.fromEntries(
+            [1, 2, 3, 4].map(id => [id, { ...createEmptyWorlds()[id], ...(saved.worlds?.[id] || {}) }])
+          ) as Record<number, WorldProgress>,
         };
       }
     } catch (e) {
@@ -226,12 +227,7 @@ class StateManager {
   }
 
   resetProgress() {
-    this.state = { ...DEFAULT_STATE, worlds: {
-      1: { levelsCompleted: [], scores: {}, stars: {} },
-      2: { levelsCompleted: [], scores: {}, stars: {} },
-      3: { levelsCompleted: [], scores: {}, stars: {} },
-      4: { levelsCompleted: [], scores: {}, stars: {} },
-    }};
+    this.state = { ...DEFAULT_STATE, worlds: createEmptyWorlds() };
     this.save();
   }
 }

@@ -382,3 +382,76 @@
   opacity: 0.3;
   pointer-events: none;
 }
+
+/* === Responsive === */
+
+/* Small phones */
+@media (max-width: 380px) {
+  .header {
+    padding: 0 var(--space-sm);
+  }
+
+  .btn {
+    padding: var(--space-sm) var(--space-md);
+    font-size: var(--text-sm);
+  }
+
+  .flip-card-front, .flip-card-back {
+    padding: var(--space-sm);
+  }
+
+  .badge-icon {
+    width: 52px;
+    height: 52px;
+    font-size: var(--text-xl);
+  }
+}
+
+/* iPad */
+@media (min-width: 768px) {
+  .header {
+    padding: 0 var(--space-lg);
+  }
+
+  .header-title {
+    font-size: var(--text-xl);
+  }
+
+  .btn {
+    font-size: var(--text-lg);
+    padding: var(--space-md) var(--space-xl);
+    min-height: 56px;
+  }
+
+  .card {
+    padding: var(--space-lg);
+  }
+
+  .flip-card {
+    height: 260px;
+  }
+
+  .flip-card-front, .flip-card-back {
+    padding: var(--space-lg);
+  }
+
+  .option-btn {
+    font-size: var(--text-lg);
+    min-height: 56px;
+  }
+
+  .badge-icon {
+    width: 80px;
+    height: 80px;
+    font-size: var(--text-3xl);
+  }
+
+  .search-input {
+    font-size: var(--text-lg);
+    min-height: 56px;
+  }
+
+  .toast {
+    font-size: var(--text-lg);
+  }
+}

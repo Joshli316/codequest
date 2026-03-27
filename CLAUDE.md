@@ -17,7 +17,7 @@ codequest/
 │   ├── main.ts             # App bootstrap, router
 │   ├── router.ts           # Hash-based SPA router
 │   ├── state.ts            # Progress, streaks, scores, review queue in localStorage
-│   ├── utils.ts            # Shared helpers: shuffle, renderFeedback, renderScoreBar, setupQuizOptions
+│   ├── utils.ts            # Shared helpers: shuffle, renderFeedback, renderScoreBar, setupQuizOptions, escapeHtml
 │   ├── data/
 │   │   ├── worlds.ts       # Single source of truth: world names, levels, level counts
 │   │   ├── vocabulary.ts   # All vocab terms with EN/ZH/pinyin/explanation
@@ -43,6 +43,7 @@ codequest/
 │   │   ├── game-boss-battle.ts      # Game 9: Interview simulation
 │   │   ├── game-daily-mission.ts    # Game 10: Daily guided task
 │   │   ├── game-peer-challenge.ts   # Game 11: Share quiz via link
+│   │   ├── game-certificate.ts     # Game 12: Final assessment + Canvas PNG certificate
 │   │   ├── profile.ts      # Profile — badges, stats, streak
 │   │   └── results.ts      # Post-game results screen
 │   ├── components/

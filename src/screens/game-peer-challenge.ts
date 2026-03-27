@@ -26,7 +26,8 @@ function decodeChallenge(hash: string): { questionIds: string[]; peerScore: numb
     const raw = hash.startsWith('#peer=') ? hash.slice(6) : null;
     if (!raw) return null;
     const data = JSON.parse(atob(raw));
-    return { questionIds: data.q || [], peerScore: data.s || 0 };
+    if (!Array.isArray(data.q) || typeof data.s !== 'number' || !isFinite(data.s)) return null;
+    return { questionIds: data.q.filter((id: unknown) => typeof id === 'string'), peerScore: Math.max(0, Math.floor(data.s)) };
   } catch {
     return null;
   }

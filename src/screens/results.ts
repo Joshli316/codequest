@@ -13,12 +13,18 @@ export function renderResults(container: HTMLElement, params: {
   score: number;
   total: number;
   gameType: string;
+  timeRemainingPct?: number;
 }) {
   const { worldId, levelIndex, score, total, gameType } = params;
   const pct = Math.round((score / Math.max(1, total)) * 100);
   const stars = pct >= 100 ? 3 : pct >= 70 ? 2 : pct >= 40 ? 1 : 0;
   const isPerfect = pct >= 100;
   const passed = pct >= 40;
+
+  // Track failed attempts for "persistent" badge
+  if (!passed) {
+    state.markLevelFailed(worldId, levelIndex);
+  }
 
   // Save progress
   if (passed) {
@@ -40,9 +46,11 @@ export function renderResults(container: HTMLElement, params: {
   checkBadge('prompt-sage', isPerfect && gameType === 'prompt-builder');
   checkBadge('interview-ready', gameType === 'boss-battle' && passed);
   checkBadge('completionist', [1, 2, 3, 4].every(w => state.getWorldCompletion(w) >= 100));
-  checkBadge('speed-demon', isPerfect && gameType === 'trivia');
+  checkBadge('speed-demon', gameType === 'trivia' && passed && (params.timeRemainingPct ?? 0) > 50);
   checkBadge('practice-master', state.getStreak().current >= 7);
   checkBadge('unstoppable', state.getStreak().current >= 21);
+  checkBadge('persistent', passed && state.hasFailedLevel(worldId, levelIndex));
+  checkBadge('word-collector', state.getLearnedVocabCount() >= 29);
 
   // Check world completion for mascot
   const worldComplete = state.getWorldCompletion(worldId) >= 100;
